@@ -10,15 +10,7 @@ local groups = {}
 local pairs, wipe =
 	  pairs, wipe
 
-local function onupdate()
-	for group in pairs(groups) do
-		group:ReSkin()
-	end
-	wipe(groups)
-	isSet = nil
-	f:SetScript("OnUpdate", nil)
-end
-
+	  
 local oldMakeAura = PitBull4.Controls.MakeAura
 function PitBull4.Controls.MakeAura(frame)
     local control = oldMakeAura(frame)
@@ -45,13 +37,16 @@ function PitBull4.Controls.MakeAura(frame)
     end
 	
 	groups[group] = 1
-	if not isSet then
-		f:SetScript("OnUpdate", onupdate)
-		isSet = 1
-	end
     
     return control
 end
+
+hooksecurefunc(PitBull4:GetModule("Aura"), "LayoutAuras", function()
+	for group in pairs(groups) do
+		group:ReSkin()
+	end
+	wipe(groups)
+end)
 
 if not LMB then
     local function OnEvent(self, event, addon)
