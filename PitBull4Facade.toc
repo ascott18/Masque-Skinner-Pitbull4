@@ -1,6 +1,6 @@
 ﻿## Interface: 40200
 ## Title: Pitbull4 Facade
-## Version: 1.2
+## Version: 1.3
 ## Author: Cybeloras of Mal'Ganis
 ## Notes: Skins Pitbull4's aura frames with ButtonFacade
 ## RequiredDeps: PitBull4_Aura

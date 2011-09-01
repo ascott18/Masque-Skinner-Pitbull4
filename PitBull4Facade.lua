@@ -16,6 +16,7 @@ local SetTexCoord = f:CreateTexture().SetTexCoord
 local oldMakeAura = PitBull4.Controls.MakeAura
 function PitBull4.Controls.MakeAura(frame)
     local control = oldMakeAura(frame)
+	control.overlay = nil -- sorry! but this is causing issues
 	
 	if not LMB and not control.count_text:GetFont() then -- old buttonfacade requires that font be set in order to fall back on, otherwise there are errors
 		control.count_text:SetFontObject(GameFontNormal)
@@ -75,7 +76,7 @@ hooksecurefunc(PitBull4.Options, "OpenConfig", function()
 	if zoom_aura then
 		zoom_aura.disabled = true
 	end
-	approachTable = nil
+	approachTable = nil -- meet your new friend: collectgarbage()
 end)
 
 if not LMB then
