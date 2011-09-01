@@ -6,7 +6,6 @@ if not Stub then return end
 
 local f = CreateFrame("Frame")
 local db, isSet
-local groups = {}
 local pairs, wipe =
 	  pairs, wipe
 	  
@@ -22,10 +21,11 @@ function PitBull4.Controls.MakeAura(frame)
 		control.count_text:SetFontObject(GameFontNormal)
 	end
 	
-	control.texture.SetTexCoord = SetTexCoord
+	control.texture.SetTexCoord = NULLFUNC
 	
     local groupname = PitBull4.Utils.GetLocalizedClassification(frame.classification)
     local group = Stub:Group("PitBull4", groupname)
+	frame.__LMBoLBFgroup = group
 	
     group:AddButton(control, {
             Icon = control.texture,
@@ -41,24 +41,25 @@ function PitBull4.Controls.MakeAura(frame)
         end
     end
 	
-	groups[group] = 1
-	
-	control.texture.SetTexCoord = NULLFUNC
+	control.texture.SetTexCoord = SetTexCoord
     
     return control
 end
 
+
 hooksecurefunc(PitBull4:GetModule("Aura"), "LayoutAuras", function(self, frame)
-	for group in pairs(groups) do
-		for button in pairs(group.Buttons) do
-			button.texture.SetTexCoord = SetTexCoord
-		end
-		group:ReSkin()
-		for button in pairs(group.Buttons) do
-			button.texture.SetTexCoord = NULLFUNC
-		end
+	local group = frame.__LMBoLBFgroup
+	if not group then return end
+	
+	for button in pairs(group.Buttons) do
+		button.texture.SetTexCoord = SetTexCoord
 	end
-	wipe(groups)
+	
+	group:ReSkin()
+	
+	for button in pairs(group.Buttons) do
+		button.texture.SetTexCoord = NULLFUNC
+	end
 end)
 
 hooksecurefunc(PitBull4.Options, "OpenConfig", function()
