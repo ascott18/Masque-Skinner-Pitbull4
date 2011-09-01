@@ -1,7 +1,7 @@
 ﻿
 local LBF = LibStub("LibButtonFacade", true)
 local LMB = LibStub("Masque", true) or (LibMasque and LibMasque("Button"))
-local Stub = (LBF or LMB)
+local Stub = (LMB or LBF)
 if not Stub then return end
 
 local f = CreateFrame("Frame")
@@ -9,7 +9,9 @@ local db, isSet
 local groups = {}
 local pairs, wipe =
 	  pairs, wipe
-
+	  
+local NULLFUNC = function() end
+local SetTexCoord = f:CreateTexture().SetTexCoord
 	  
 local oldMakeAura = PitBull4.Controls.MakeAura
 function PitBull4.Controls.MakeAura(frame)
@@ -18,6 +20,8 @@ function PitBull4.Controls.MakeAura(frame)
 	if not LMB and not control.count_text:GetFont() then -- old buttonfacade requires that font be set in order to fall back on, otherwise there are errors
 		control.count_text:SetFontObject(GameFontNormal)
 	end
+	
+	control.texture.SetTexCoord = SetTexCoord
 	
     local groupname = PitBull4.Utils.GetLocalizedClassification(frame.classification)
     local group = Stub:Group("PitBull4", groupname)
@@ -37,15 +41,41 @@ function PitBull4.Controls.MakeAura(frame)
     end
 	
 	groups[group] = 1
+	
+	control.texture.SetTexCoord = NULLFUNC
     
     return control
 end
 
-hooksecurefunc(PitBull4:GetModule("Aura"), "LayoutAuras", function()
+hooksecurefunc(PitBull4:GetModule("Aura"), "LayoutAuras", function(self, frame)
 	for group in pairs(groups) do
+		for button in pairs(group.Buttons) do
+			button.texture.SetTexCoord = SetTexCoord
+		end
 		group:ReSkin()
+		for button in pairs(group.Buttons) do
+			button.texture.SetTexCoord = NULLFUNC
+		end
 	end
 	wipe(groups)
+end)
+
+hooksecurefunc(PitBull4.Options, "OpenConfig", function()
+	local function approachTable(...)
+		local t = ...
+		if not t then return end
+		for i=2, select("#", ...) do
+			t = t[select(i, ...)]
+			if not t then return end
+		end
+		return t
+	end
+	local options = LibStub("AceConfigRegistry-3.0"):GetOptionsTable("PitBull4", "dialog", "PitBull4Facade-1.0")
+	local zoom_aura = approachTable(options, "args", "layout_editor", "args", "Aura", "args", "display", "args", "zoom_aura")
+	if zoom_aura then
+		zoom_aura.disabled = true
+	end
+	approachTable = nil
 end)
 
 if not LMB then
