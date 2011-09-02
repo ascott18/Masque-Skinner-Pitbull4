@@ -16,13 +16,10 @@ local oldMakeAura = PitBull4.Controls.MakeAura
 -- raw hook used because i need access to the return value of the orig. function
 function PitBull4.Controls.MakeAura(frame)
     local button = oldMakeAura(frame)
-	button.overlay = nil -- sorry! but this is causing issues
 	
 	if not LMB and not button.count_text:GetFont() then -- old buttonfacade requires that font be set in order to fall back on, otherwise there are errors
 		button.count_text:SetFontObject(GameFontNormal)
 	end
-	
-	button.texture.SetTexCoord = SetTexCoord 
 	
     local groupname = PitBull4.Utils.GetLocalizedClassification(frame.classification)
     local group = Stub:Group("PitBull4", groupname)
@@ -42,7 +39,7 @@ function PitBull4.Controls.MakeAura(frame)
         end
     end
 	
-	button.texture.SetTexCoord = NULLFUNC --PB4 attempts its own tex coord setting, but that causes it to be overriden.
+	button.texture.SetTexCoord = NULLFUNC --PB4 attempts its own tex coord setting, but that causes skin settings to be overriden.
     
     return button
 end
@@ -59,7 +56,7 @@ hooksecurefunc(PitBull4:GetModule("Aura"), "LayoutAuras", function(self, frame)
 	group:ReSkin()
 	
 	for button in pairs(group.Buttons) do
-		button.texture.SetTexCoord = NULLFUNC  --PB4 attempts its own tex coord setting, but that causes it to be overriden.
+		button.texture.SetTexCoord = NULLFUNC  --PB4 attempts its own tex coord setting, but that causes skin settings to be overriden.
 	end
 end)
 
