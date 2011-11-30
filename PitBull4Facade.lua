@@ -1,8 +1,6 @@
 ﻿
-local LBF = LibStub("LibButtonFacade", true)
 local LMB = LibStub("Masque", true) or (LibMasque and LibMasque("Button"))
-local Stub = (LMB or LBF)
-if not Stub then return end
+if not LMB then return end
 
 local f = CreateFrame("Frame")
 local db, isSet
@@ -17,13 +15,9 @@ local oldMakeAura = PitBull4.Controls.MakeAura
 function PitBull4.Controls.MakeAura(frame)
     local button = oldMakeAura(frame)
 	
-	if not LMB and not button.count_text:GetFont() then -- old buttonfacade requires that font be set in order to fall back on, otherwise there are errors
-		button.count_text:SetFontObject(GameFontNormal)
-	end
-	
     local groupname = PitBull4.Utils.GetLocalizedClassification(frame.classification)
-    local group = Stub:Group("PitBull4", groupname)
-	frame.__LMBoLBFgroup = group
+    local group = LMB:Group("PitBull4", groupname)
+	frame.__LMBgroup = group
 	
     group:AddButton(button, {
             Icon = button.texture,
@@ -31,13 +25,6 @@ function PitBull4.Controls.MakeAura(frame)
             Border = button.border,
             Count = button.count_text
     })
-    
-    if not LMB then
-        local v = PitBull4Facade and PitBull4Facade[groupName]
-        if v then
-            group:Skin(v.S,v.G,v.B,v.C)
-        end
-    end
 	
 	button.texture.SetTexCoord = NULLFUNC --PB4 attempts its own tex coord setting, but that causes skin settings to be overriden.
     
@@ -46,7 +33,7 @@ end
 
 
 hooksecurefunc(PitBull4:GetModule("Aura"), "LayoutAuras", function(self, frame)
-	local group = frame.__LMBoLBFgroup
+	local group = frame.__LMBgroup
 	if not group then return end
 	
 	for button in pairs(group.Buttons) do
@@ -76,32 +63,5 @@ hooksecurefunc(PitBull4.Options, "OpenConfig", function()
 	if zoom_aura then
 		zoom_aura.disabled = true
 	end
-	approachTable = nil -- meet your new friend: collectgarbage()
+	approachTable = nil -- meet your new friend. his name is collectgarbage()
 end)
-
-if not LMB then
-    local function OnEvent(self, event, addon)
-        PitBull4Facade = PitBull4Facade or {}
-        db = PitBull4Facade
-        Stub:RegisterSkinCallback("PitBull4",
-            function(_, SkinID, Gloss, Backdrop, Group, _, Colors)
-                if not (db and SkinID) then return end
-                if Group then
-                    local gs = db[Group] or {}
-                    db[Group] = gs
-                    gs.S = SkinID
-                    gs.G = Gloss
-                    gs.B = Backdrop
-                    gs.C = Colors
-                end
-            end
-        )
-        for k, v in pairs(db) do
-            Stub:Group("PitBull4", k):Skin(v.S,v.G,v.B,v.C)
-        end
-        f:SetScript("OnEvent", nil)
-    end
-    
-    f:RegisterEvent("PLAYER_ENTERING_WORLD")
-    f:SetScript("OnEvent", OnEvent)
-end
