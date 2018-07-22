@@ -1,6 +1,6 @@
-﻿## Interface: 60000
+﻿## Interface: 80000
 ## Title: Masque Skinner: Pitbull4
-## Version: 1.6.2
+## Version: 1.6.3
 ## Author: Cybeloras
 ## Notes: Skins Pitbull4's aura frames with Masque
 ## RequiredDeps: PitBull4_Aura, Masque
